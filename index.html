@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idébot</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#3a6b58">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #f4f3ef;
+      --surface:      #ffffff;
+      --text:         #1c1c1e;
+      --muted:        #6e6e73;
+      --primary:      #3a6b58;
+      --primary-bg:   #eaf1ed;
+      --border:       #e5e3de;
+      --radius:       14px;
+      --radius-sm:    9px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:         #161917;
+        --surface:    #1f2420;
+        --text:       #e8e6e1;
+        --muted:      #8a8a8f;
+        --primary:    #5fa37f;
+        --primary-bg: #1a2e24;
+        --border:     #2e3530;
+      }
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 14px 110px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @media (min-width: 480px) {
+      body { padding: 28px 20px 110px; }
+    }
+
+    @media (min-width: 640px) {
+      body { padding: 40px 24px 64px; }
+    }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ──────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .logo-img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .logo-img { width: 88px; height: 88px; }
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--primary);
+    }
+
+    @media (min-width: 640px) {
+      .logo { font-size: 1.85rem; }
+    }
+
+    .tagline {
+      margin-top: 6px;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    /* ── Sections ─────────────────────────────────────── */
+    .section { margin-bottom: 28px; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .section-label span {
+      font-size: 0.85em;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    /* ── Settings / Tilkobling ────────────────────────── */
+    .settings-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: var(--surface);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    @media (min-width: 480px) {
+      .settings-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .input-group.provider { flex: 1; min-width: 140px; }
+      .input-group.model { flex: 1.5; min-width: 160px; }
+      .input-group.temperature { flex: 0.5; min-width: 70px; }
+      .input-group.apikey { flex: 1; min-width: 140px; }
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .input-group select,
+    .input-group input {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: border-color 0.13s, box-shadow 0.13s;
+    }
+
+    .input-group select:focus,
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-bg);
+    }
+
+    .full-width-select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: border-color 0.13s, box-shadow 0.13s;
+      cursor: pointer;
+    }
+
+    .full-width-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-bg);
+    }
+
+    /* ── Chips ────────────────────────────────────────── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 16px;
+      min-height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.13s, border-color 0.13s, color 0.13s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1.3;
+    }
+
+    .chip:hover { border-color: var(--primary); color: var(--primary); }
+    .chip:active { transform: scale(0.96); }
+    .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* ── Generate button ──────────────────────────────── */
+    .btn-generate-wrap {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 14px max(16px, env(safe-area-inset-bottom));
+      background: linear-gradient(to bottom, transparent, var(--bg) 35%);
+      z-index: 100;
+    }
+
+    @media (min-width: 480px) {
+      .btn-generate-wrap { padding-left: 20px; padding-right: 20px; }
+    }
+
+    @media (min-width: 640px) {
+      .btn-generate-wrap {
+        position: static;
+        padding: 4px 0 0;
+        background: none;
+      }
+    }
+
+    .btn-generate {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      display: block;
+      padding: 15px;
+      min-height: 52px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-generate:hover:not(:disabled) { opacity: 0.88; }
+    .btn-generate:active:not(:disabled) { transform: scale(0.99); }
+    .btn-generate:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .btn-generate:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: -3px;
+      margin-right: 8px;
+      will-change: transform;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error ────────────────────────────────────────── */
+    .error {
+      margin-top: 18px;
+      padding: 13px 16px;
+      background: #fff5f5;
+      border: 1px solid #fcc;
+      border-radius: var(--radius-sm);
+      color: #c00;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* ── Result card ──────────────────────────────────── */
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      margin-top: 32px;
+      animation: rise 0.35s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    @media (min-width: 480px) {
+      .result-name { font-size: 1.55rem; }
+    }
+
+    .result-hook {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .result-desc {
+      font-size: 0.93rem;
+      line-height: 1.72;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .result-desc p + p { margin-top: 11px; }
+
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+
+    .features li {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+    }
+
+    .features li::before {
+      content: '→';
+      color: var(--primary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Impact bars ──────────────────────────────────── */
+    .impact-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .impact-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      margin-bottom: 16px;
+    }
+
+    .impact-row {
+      display: grid;
+      grid-template-columns: 148px 1fr 28px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 400px) {
+      .impact-row { grid-template-columns: 120px 1fr 24px; }
+    }
+
+    .impact-name {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .bar-track {
+      height: 7px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      background: var(--primary);
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
+      will-change: width;
+    }
+
+    .bar-fill[data-key="reach"]         { background: #f59e0b; }
+    .bar-fill[data-key="depth"]         { background: #3b82f6; }
+    .bar-fill[data-key="feasibility"]   { background: var(--primary); }
+    .bar-fill[data-key="novelty"]       { background: #8b5cf6; }
+    .bar-fill[data-key="ripple_effect"] { background: #ec4899; }
+
+    .impact-val {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .impact-summary {
+      font-size: 0.855rem;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.6;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-save-log {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 11px 20px;
+      min-height: 44px;
+      background: var(--primary-bg);
+      border: 1px solid var(--primary);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      transition: background 0.13s, color 0.13s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-save-log:hover { background: var(--primary); color: #fff; }
+    .btn-save-log:active { transform: scale(0.98); }
+    .btn-save-log:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .card-actions > * { flex: 1; }
+
+    .btn-make-prompt {
+      min-height: 44px;
+      padding: 11px 20px;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.13s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-make-prompt:hover:not(:disabled) { opacity: 0.88; }
+    .btn-make-prompt:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-make-prompt:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .prompt-output {
+      display: none;
+      margin-top: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .prompt-output.open { display: block; }
+
+    .prompt-output-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-copy {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.13s, color 0.13s;
+      font-family: inherit;
+    }
+
+    .btn-copy:hover { border-color: var(--primary); color: var(--primary); }
+
+    .prompt-output pre {
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 0.75rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.55;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <img src="ideabot.png" alt="Idébot" class="logo-img">
+    <div class="logo">Idébot</div>
+    <p class="tagline">Generer banebrytende app-idéer</p>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Tilkobling <span>(velg oppsett og modell)</span></div>
+    <div class="settings-grid">
+      <div class="input-group provider">
+        <label for="api-provider">Leverandør</label>
+        <select id="api-provider">
+          <option value="openrouter">OpenRouter</option>
+          <option value="tailscale">LM Studio (Tailscale)</option>
+          <option value="local" selected>LM Studio (Lokal)</option>
+        </select>
+      </div>
+      <div class="input-group model">
+        <label for="api-model">Modell</label>
+        <input type="text" id="api-model">
+      </div>
+      <div class="input-group temperature">
+        <label for="api-temperature">Temp</label>
+        <input type="number" id="api-temperature" min="0" max="2" step="0.1" value="1.0">
+      </div>
+      <div class="input-group apikey">
+        <label for="api-key">API-nøkkel</label>
+        <input type="password" id="api-key" placeholder="Din API-nøkkel">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Fokusområder <span>(velg ett eller flere)</span></div>
+    <div class="chips" id="focus-chips"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Tidshorisont <span>(velg én)</span></div>
+    <div class="chips" id="timeline-chips"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Kreativ Katalysator <span>(valgfritt)</span></div>
+    <select id="catalyst-select" class="full-width-select">
+      <option value="random">🎲 Tilfeldig katalysator</option>
+      <!-- Fylles dynamisk med JS -->
+    </select>
+  </div>
+
+  <div class="btn-generate-wrap">
+    <button class="btn-generate" id="btn-generate" disabled>Generer idé</button>
+  </div>
+
+  <div id="error-area"></div>
+  <div id="result-area"></div>
+
+</div>
+
+<script>
+// ── KONFIGURASJON ──────────────────────────────────────────────────────────
+
+const CONFIG = {
+  openrouter: {
+    baseUrl: 'https://openrouter.ai/api/v1',
+    apiKey: '',
+    defaultModel: 'anthropic/claude-opus-4.7'
+  },
+  tailscale: {
+    baseUrl: 'https://desktop-lfe556i.tail0c65ff.ts.net/v1',
+    apiKey: '',
+    defaultModel: 'gemma-4-26b-a4b-it@q4_k_s'
+  },
+  local: {
+    baseUrl: 'http://192.168.10.102:1234/v1',
+    apiKey: '',
+    defaultModel: 'google/gemma-4-12b-qat'
+  }
+};
+
+const MAX_TOKENS = 1200;
+const LOCAL_MAX_TOKENS = 4096;
+
+// ── UI FOR INNSTILLINGER ───────────────────────────────────────────────────
+
+const providerSelect = document.getElementById('api-provider');
+const modelInput = document.getElementById('api-model');
+const apiKeyInput = document.getElementById('api-key');
+const temperatureInput = document.getElementById('api-temperature');
+
+function updateSettingsUI() {
+  const provider = providerSelect.value;
+  modelInput.value = CONFIG[provider].defaultModel;
+  apiKeyInput.value = CONFIG[provider].apiKey;
+}
+
+providerSelect.addEventListener('change', updateSettingsUI);
+updateSettingsUI(); // Initialisering
+
+function buildApiHeaders(apiKey) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+  return headers;
+}
+
+function tokenBudgetFor(provider, desiredTokens) {
+  return provider === 'local'
+    ? Math.max(desiredTokens, LOCAL_MAX_TOKENS)
+    : desiredTokens;
+}
+
+function assistantText(data) {
+  const content = data.choices?.[0]?.message?.content;
+  if (Array.isArray(content)) {
+    return content
+      .map(part => typeof part === 'string' ? part : (part?.text ?? ''))
+      .join('');
+  }
+  return content ?? '';
+}
+
+function emptyResponseMessage(data) {
+  const finishReason = data.choices?.[0]?.finish_reason;
+  if (finishReason === 'length') {
+    return 'Modellen brukte opp tokenbudsjettet før den skrev ferdig svaret. Prøv igjen, eller øk tokenrammen i koden.';
+  }
+  return 'Modellen returnerte tomt svar.';
+}
+
+function stripCodeFences(text) {
+  return String(text)
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/i, '')
+    .trim();
+}
+
+function extractJsonObject(text) {
+  const cleaned = stripCodeFences(text);
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  return start >= 0 && end > start
+    ? cleaned.slice(start, end + 1)
+    : cleaned;
+}
+
+function escapeNewlinesInJsonStrings(text) {
+  let out = '';
+  let inString = false;
+  let escaped = false;
+
+  for (const ch of text) {
+    if (escaped) {
+      out += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      out += ch;
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      out += ch;
+      continue;
+    }
+    if (inString && (ch === '\n' || ch === '\r')) {
+      out += '\\n';
+      continue;
+    }
+    out += ch;
+  }
+
+  return out;
+}
+
+function parseIdeaJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch (firstErr) {
+    const repaired = escapeNewlinesInJsonStrings(text)
+      .replace(/,\s*([}\]])/g, '$1');
+    try {
+      return JSON.parse(repaired);
+    } catch {
+      throw new Error(`Modellen returnerte ikke gyldig JSON: ${firstErr.message}`);
+    }
+  }
+}
+
+if (window.location.protocol === 'file:') {
+  console.warn('Idébot kjøres fra file://. Start mappen med start_ideabot_local.bat for å kjøre via http://localhost.');
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+
+const FOCUS_AREAS = [
+  'Psykisk helse og velvære',
+  'Utdanning og læring',
+  'Miljø og bærekraft',
+  'Sosial tilhørighet og fellesskap',
+  'Tilgjengelighet og inkludering',
+  'Helse og forebygging',
+  'Fattigdom og økonomisk likhet',
+  'Eldreomsorg og støtte',
+  'Barns utvikling og trygghet',
+  'Kreativitet og selvutfoldelse',
+];
+
+const TIMELINES = [
+  'Umiddelbar effekt (0–1 år)',
+  'Kort sikt (1–3 år)',
+  'Mellomlang sikt (3–10 år)',
+  'Lang sikt (10+ år)',
+  'Generasjonsendring',
+];
+
+const CATALYSTS = [
+  'Hva om vi brukte maurekoloniers selvorganiserende prinsipper på dette?',
+  'Hvordan ville en 7-åring redesignet dette fra bunnen av?',
+  'Hvilken eldgammel rituell praksis kan digitalt nytenkes her?',
+  'Hva om denne appen fungerte BEDRE når fremmede brukte den sammen?',
+  'Hva om appen ikke hadde skjerm – hvordan ville den fungere gjennom lyd eller berøring alene?',
+  'Bruk det japanske begrepet ikigai – grunnen til å leve – som en kjernemekanisme.',
+  'Hva om løsningen innebar å bevisst bremse noe ned i stedet for å akselerere det?',
+  'Hvordan ville en bibliotekar, en gartner og en jazzmusiker sammen redesignet dette?',
+  'Hva om appen lærte av hvordan skoger deler ressurser gjennom rotnettverkene sine?',
+  'Snu problemet: i stedet for å fikse det negative, forsterk noe positivt som naturlig fortrenger problemet.',
+  'Hva om brukerne bare kunne bruke appen 5 minutter per dag – hvordan ville den begrensningen forbedre den?',
+  'Bruk konseptet "tråkkstier" – de uoffisielle stiene folk naturlig skaper – på dette problemet.',
+  'Hva om appen behandlet problemet som kompostering – å forvandle avfall til noe nærende?',
+  'Hvordan ville urfolks prinsipper for landforvaltning forme dette designet?',
+  'Hva om den viktigste funksjonen var det appen IKKE gjør?',
+  'Hva om vi kombinerte meditasjonens stillhet med lekens vitalitet i denne løsningen?',
+  'Tenk som vann – hva om løsningen fulgte minste motstands vei i stedet for å tvinge seg gjennom?',
+];
+
+const IMPACT_LABELS = {
+  reach:         'Rekkevidde',
+  depth:         'Dybde',
+  feasibility:   'Gjennomførbarhet',
+  novelty:       'Nytenkning',
+  ripple_effect: 'Ringvirkninger',
+};
+
+const IDEA_JSON_SCHEMA = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    hook: { type: 'string' },
+    description: { type: 'string' },
+    features: {
+      type: 'array',
+      items: { type: 'string' },
+      minItems: 3,
+      maxItems: 6
+    },
+    impact: {
+      type: 'object',
+      properties: {
+        reach: { type: 'integer', minimum: 1, maximum: 10 },
+        depth: { type: 'integer', minimum: 1, maximum: 10 },
+        feasibility: { type: 'integer', minimum: 1, maximum: 10 },
+        novelty: { type: 'integer', minimum: 1, maximum: 10 },
+        ripple_effect: { type: 'integer', minimum: 1, maximum: 10 },
+        summary: { type: 'string' }
+      },
+      required: ['reach', 'depth', 'feasibility', 'novelty', 'ripple_effect', 'summary'],
+      additionalProperties: false
+    }
+  },
+  required: ['name', 'hook', 'description', 'features', 'impact'],
+  additionalProperties: false
+};
+
+const SYSTEM_PROMPT = 'Du er en visionær sosial innovatør og idémaskin. Din oppgave er å skape banebrytende app-idéer som kan forbedre menneskers livskvalitet og velvære. Du kombinerer dyp empati med teknisk gjennomførbarhet. Verdi måles ALDRI kommersielt — kun etter idéens potensial til å transformere eller forbedre menneskehetens ve og vel på kort OG lang sikt. Du unngår bedriftsspråk som «synergi», «disruptiv» eller «leverage». Du er varm, oppmuntrende og genuint optimistisk. Svar på norsk.';
+
+// ── INIT CATALYST DROPDOWN ─────────────────────────────────────────────────
+const catalystSelect = document.getElementById('catalyst-select');
+CATALYSTS.forEach((cat, index) => {
+  const option = document.createElement('option');
+  option.value = index;
+  option.textContent = cat;
+  catalystSelect.appendChild(option);
+});
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const selectedFocuses = new Set();
+let selectedTimeline  = null;
+
+// ── BUILD CHIPS ───────────────────────────────────────────────────────────
+function buildChips(container, items, onToggle, singleSelect) {
+  items.forEach(label => {
+    const btn = document.createElement('button');
+    btn.className   = 'chip';
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      if (singleSelect) {
+        container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+      } else {
+        btn.classList.toggle('active');
+      }
+      onToggle(label, btn.classList.contains('active'));
+      refreshBtn();
+    });
+    container.appendChild(btn);
+  });
+}
+
+buildChips(
+  document.getElementById('focus-chips'),
+  FOCUS_AREAS,
+  (label, on) => on ? selectedFocuses.add(label) : selectedFocuses.delete(label),
+  false
+);
+
+buildChips(
+  document.getElementById('timeline-chips'),
+  TIMELINES,
+  (label, on) => { selectedTimeline = on ? label : null; },
+  true
+);
+
+function refreshBtn() {
+  document.getElementById('btn-generate').disabled =
+    selectedFocuses.size === 0 || !selectedTimeline;
+}
+
+// ── VIBE-CODING PROMPT ────────────────────────────────────────────────────
+const VIBE_SYSTEM_PROMPT = `You are an expert at writing precise vibe-coding instructions for LLM coding assistants. You take an app idea and produce one complete, self-contained prompt a developer can paste directly into Cursor, Claude Code, or Windsurf. Focus: demo-friendly MVP, not production code.`;
+
+const buildVibePrompt = (idea) =>
+`App idea: ${idea.name}
+Hook: ${idea.hook}
+Description: ${(idea.description || '').replace(/\n/g, ' ')}
+Core features:
+${(idea.features || []).map(f => `- ${f}`).join('\n')}
+
+Write a complete vibe-coding prompt that:
+1. States the app's purpose and target user clearly
+2. Recommends a suitable tech stack for an interactive demo (e.g. single HTML file, React + Vite, Python/Streamlit — pick what fits best)
+3. Lists the key screens/views to implement with brief UX notes
+4. Describes visual tone and style (minimal, warm, playful, etc.)
+5. Specifies mock data or simulated user flows where real data isn't needed
+6. Is written as one cohesive instruction, ready to paste into a coding assistant
+
+Reply with ONLY the prompt itself — no explanation, no markdown wrapper, no text outside the prompt.`;
+
+async function makePrompt() {
+  const idea = logValues.ide;
+  if (!idea) return;
+
+  const btn = document.getElementById('btn-make-prompt');
+  const out = document.getElementById('prompt-output');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Genererer…';
+  out.classList.remove('open');
+
+  const provider = providerSelect.value;
+  const BASE_URL = CONFIG[provider].baseUrl;
+  const MODEL = modelInput.value.trim();
+  const API_KEY = apiKeyInput.value.trim();
+
+  try {
+    const res = await fetch(`${BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: buildApiHeaders(API_KEY),
+      body: JSON.stringify({
+        model:       MODEL,
+        temperature: 0.7,
+        max_tokens:  tokenBudgetFor(provider, 1800),
+        messages: [
+          { role: 'system', content: VIBE_SYSTEM_PROMPT },
+          { role: 'user',   content: buildVibePrompt(idea) },
+        ],
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+
+    const text = stripCodeFences(assistantText(data));
+    if (!text) throw new Error(emptyResponseMessage(data));
+    document.getElementById('prompt-text').textContent = text;
+    out.classList.add('open');
+  } catch (err) {
+    document.getElementById('prompt-text').textContent = `Feil: ${err.message}`;
+    out.classList.add('open');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Lag prompt';
+  }
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Kopiert ✓';
+    setTimeout(() => { btn.textContent = 'Kopier'; }, 2000);
+  });
+}
+
+// ── LOGGING ───────────────────────────────────────────────────────────────
+const LOG_FIELDS = [
+  { key: 'MODEL',         label: 'MODEL' },
+  { key: 'TEMPERATURE',   label: 'TEMPERATURE' },
+  { key: 'FOCUS_AREAS',   label: 'FOCUS_AREAS' },
+  { key: 'TIMELINES',     label: 'TIMELINES' },
+  { key: 'CATALYSTS',     label: 'CATALYSTS' },
+  { key: 'ide',           label: 'idé' },
+  { key: 'reach',         label: 'reach' },
+  { key: 'depth',         label: 'depth' },
+  { key: 'feasibility',   label: 'feasibility' },
+  { key: 'novelty',       label: 'novelty' },
+  { key: 'ripple_effect', label: 'ripple_effect' },
+];
+
+const logValues = { MODEL: '', TEMPERATURE: 1.0 };
+
+function setLogIdea(idea, focusNames, timelineName, catalyst, currentModel, currentTemp) {
+  logValues.MODEL         = currentModel;
+  logValues.TEMPERATURE   = currentTemp;
+  logValues.FOCUS_AREAS   = focusNames;
+  logValues.TIMELINES     = timelineName;
+  logValues.CATALYSTS     = catalyst;
+  logValues.ide           = idea;
+  logValues.reach         = idea?.impact?.reach;
+  logValues.depth         = idea?.impact?.depth;
+  logValues.feasibility   = idea?.impact?.feasibility;
+  logValues.novelty       = idea?.impact?.novelty;
+  logValues.ripple_effect = idea?.impact?.ripple_effect;
+}
+
+function saveLogToFile() {
+  const lines = LOG_FIELDS.map(f => {
+    const val = logValues[f.key];
+    const txt = (val === undefined || val === null)
+      ? '—'
+      : typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val);
+    return `=== ${f.label} ===\n${txt}`;
+  });
+  const blob = new Blob([lines.join('\n\n')], { type: 'text/plain' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  const ideaName = (logValues.ide?.name || 'ukjent').replace(/[\\/:*?"<>|]/g, '-');
+  a.download = `ideabot-${ideaName}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── GENERATE ──────────────────────────────────────────────────────────────
+document.getElementById('btn-generate').addEventListener('click', async () => {
+  const btn        = document.getElementById('btn-generate');
+  const errorArea  = document.getElementById('error-area');
+  const resultArea = document.getElementById('result-area');
+
+  errorArea.innerHTML  = '';
+  resultArea.innerHTML = '';
+  btn.disabled         = true;
+  btn.innerHTML        = '<span class="spinner"></span>Genererer…';
+
+  const catVal = catalystSelect.value;
+  const catalyst = catVal === 'random'
+    ? CATALYSTS[Math.floor(Math.random() * CATALYSTS.length)]
+    : CATALYSTS[Number(catVal)];
+
+  const focusNames  = [...selectedFocuses];
+  const timelineName = selectedTimeline;
+
+  const provider = providerSelect.value;
+  const BASE_URL = CONFIG[provider].baseUrl;
+  const MODEL = modelInput.value.trim();
+  const API_KEY = apiKeyInput.value.trim();
+
+  let tempVal = parseFloat(temperatureInput.value);
+  const currentTemp = isNaN(tempVal) ? 1.0 : tempVal;
+
+  const userPrompt =
+`Jeg trenger en banebrytende app-idé som kan gjøre en reell forskjell for menneskeheten.
+-
+PROBLEMOMRÅDE(R): ${focusNames.join(', ')}
+-
+TIDSHORISONT: ${timelineName}
+-
+KREATIV KATALYSATOR — bruk dette som en uventet tankebryter for å presse idéen i en uventet retning: «${catalyst}»
+Tenk dypt og kreativt. Kombiner empati, teknologi og denne kreative katalysatoren for å skape en app-idé som virkelig fortjener reaksjonen: «Hvorfor har ingen tenkt på dette før?»
+Svar med KUN gyldig JSON (ingen markdown, ingen kodeblokker, ingen tekst før eller etter).
+VIKTIG: Bruk \\n for avsnittsskift inne i strenger, ALDRI ekte linjeskift inne i JSON-strengverdier. Hold description til maks 3 korte avsnitt.
+Vær kritisk og realistisk i impact-scoringen — bruk hele skalaen fra 1 til 10, og la feasibility særlig reflektere ekte tekniske og ressursmessige begrensninger. Ikke stable høye tall for å imponere. Description skal være én JSON-streng med \\n mellom avsnitt, ikke ekte linjeskift.
+{
+"name": "Appens navn",
+"hook": "En kort inspirerende setning",
+"description": "Avsnitt 1...\\nAvsnitt 2...\\nAvsnitt 3...",
+"features": ["Funksjon 1", "Funksjon 2", "Funksjon 3"],
+"impact": {
+"reach": <tall 1-10>,
+"depth": <tall 1-10>,
+"feasibility": <tall 1-10>,
+"novelty": <tall 1-10>,
+"ripple_effect": <tall 1-10>,
+"summary": "Kort oppsummering av humanitær effekt."
+}
+}`;
+
+  try {
+    const requestBody = {
+      model:       MODEL,
+      temperature: currentTemp,
+      max_tokens:  tokenBudgetFor(provider, MAX_TOKENS),
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user',   content: userPrompt },
+      ],
+    };
+
+    if (provider === 'local' || provider === 'tailscale') {
+      requestBody.response_format = {
+        type: 'json_schema',
+        json_schema: {
+          name: 'ideabot_idea',
+          schema: IDEA_JSON_SCHEMA,
+          strict: true
+        }
+      };
+    }
+
+    const res = await fetch(`${BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: buildApiHeaders(API_KEY),
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error?.message || `HTTP ${res.status}`);
+    }
+
+    const raw = assistantText(data);
+    const cleaned = extractJsonObject(raw);
+    if (!cleaned) throw new Error(emptyResponseMessage(data));
+
+    const idea = parseIdeaJson(cleaned);
+    renderResult(idea);
+    setLogIdea(idea, focusNames, timelineName, catalyst, MODEL, currentTemp);
+
+  } catch (err) {
+    errorArea.innerHTML =
+      `<div class="error">Noe gikk galt: ${esc(err.message)}</div>`;
+  } finally {
+    btn.innerHTML = 'Generer idé';
+    refreshBtn();
+  }
+});
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderResult(idea) {
+  const area = document.getElementById('result-area');
+
+  const descHtml = (idea.description || '')
+    .split('\n')
+    .filter(p => p.trim())
+    .map(p => `<p>${esc(p)}</p>`)
+    .join('');
+
+  const featuresHtml = (idea.features || [])
+    .map(f => `<li>${esc(f)}</li>`)
+    .join('');
+
+  const impactKeys    = ['reach', 'depth', 'feasibility', 'novelty', 'ripple_effect'];
+  const impactRowsHtml = impactKeys.map(key => {
+    const val = idea.impact?.[key] ?? 0;
+    return `
+      <div class="impact-row">
+        <span class="impact-name">${IMPACT_LABELS[key]}</span>
+        <div class="bar-track">
+          <div class="bar-fill" data-pct="${val * 10}" data-key="${key}"></div>
+        </div>
+        <span class="impact-val">${val}</span>
+      </div>`;
+  }).join('');
+
+  area.innerHTML = `
+    <div class="result-card">
+      <div class="result-name">${esc(idea.name || '')}</div>
+      <div class="result-hook">${esc(idea.hook || '')}</div>
+      <div class="result-desc">${descHtml}</div>
+      <div class="card-label">Nøkkelfunksjoner</div>
+      <ul class="features">${featuresHtml}</ul>
+      <div class="impact-section">
+        <div class="card-label">Humanitær effekt</div>
+        <div class="impact-grid">${impactRowsHtml}</div>
+        <div class="impact-summary">${esc(idea.impact?.summary || '')}</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-save-log" onclick="saveLogToFile()">Lagre idé</button>
+        <button class="btn-make-prompt" id="btn-make-prompt" onclick="makePrompt()">Lag prompt</button>
+      </div>
+      <div class="prompt-output" id="prompt-output">
+        <div class="prompt-output-label">
+          <span>Vibe-coding prompt</span>
+          <button class="btn-copy" onclick="copyPrompt()">Kopier</button>
+        </div>
+        <pre id="prompt-text"></pre>
+      </div>
+    </div>`;
+
+  requestAnimationFrame(() => {
+    area.querySelectorAll('.bar-fill').forEach(bar => {
+      const pct = bar.dataset.pct;
+      setTimeout(() => { bar.style.width = pct + '%'; }, 60);
+    });
+  });
+
+  area.querySelector('.result-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>

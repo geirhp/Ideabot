@@ -1,0 +1,17 @@
+{
+  "name": "Idébot",
+  "short_name": "Idébot",
+  "description": "Generer banebrytende app-idéer",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f3ef",
+  "theme_color": "#3a6b58",
+  "icons": [
+    {
+      "src": "ideabot.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
